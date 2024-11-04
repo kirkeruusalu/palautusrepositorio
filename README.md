@@ -1,3 +1,3 @@
-#palautukset ohjelmistotuotanto 2024
+# palautukset ohjelmistotuotanto 2024
 
-[(https://github.com/kirkeruusalu/ohtuvarasto)]
+[tasks 2-13](https://github.com/kirkeruusalu/ohtuvarasto)
