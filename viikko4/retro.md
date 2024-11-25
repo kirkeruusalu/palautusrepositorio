@@ -10,4 +10,4 @@ These comments include: things we should start doing, things we should stop doin
 ## Glad, Sad, Mad
 This technique involves the team members discussing problems, changes, or general observations they noticed during the sprint.
 They will all be categorized as positive(glad), negative(sad), or problem situation(mad). The problem situations can also involved greater issues that don't have to do with the team in particular.
-..
+
