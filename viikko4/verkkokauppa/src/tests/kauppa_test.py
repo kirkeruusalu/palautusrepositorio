@@ -26,6 +26,8 @@ class TestKauppa(unittest.TestCase):
                 return Tuote(1, "maito", 5)
             if tuote_id == 2:
                 return Tuote(2, "rice", 3)
+            if tuote_id == 3:
+                return Tuote(3, "chicken", 7)
             
         self.varasto_mock.saldo.side_effect = varasto_saldo
         self.varasto_mock.hae_tuote.side_effect = varasto_hae_tuote
@@ -76,4 +78,42 @@ class TestKauppa(unittest.TestCase):
         self.kauppa.tilimaksu("pekka", "12345")
 
         self.pankki_mock.tilisiirto.assert_called_with("pekka", 42, "12345", "33333-44455", 5)
+
+    def test_bank_method_aloita_asiointi_resets_data_of_previous_purchase(self):
+        self.kauppa.aloita_asiointi()
+        self.kauppa.lisaa_koriin(1)
+        self.kauppa.lisaa_koriin(2)
+        self.kauppa.tilimaksu("pekka", "12345")
+
+        self.kauppa.aloita_asiointi()
+        self.kauppa.lisaa_koriin(1)
+        self.kauppa.tilimaksu("pekka", "12345")
+
+        self.pankki_mock.tilisiirto.assert_called_with("pekka", 42, "12345", "33333-44455", 5)
+    
+    def test_bank_method_requests_new_reference_number_for_each_transaction(self):
+        viitegeneraattori_mock = Mock(wraps=Viitegeneraattori())
+        kauppa = Kauppa(self.varasto_mock, self.pankki_mock, viitegeneraattori_mock)
+        kauppa.aloita_asiointi()
+        kauppa.lisaa_koriin(1)
+        kauppa.tilimaksu("pekka", "12345")
+
+        self.pankki_mock.tilisiirto.assert_called_with("pekka", 2, "12345", "33333-44455", 5)
+
+        kauppa.aloita_asiointi()
+        kauppa.lisaa_koriin(2)
+        kauppa.lisaa_koriin(2)
+        kauppa.tilimaksu("pekka", "12345")
+        self.pankki_mock.tilisiirto.assert_called_with("pekka", 3, "12345", "33333-44455", 6)
+      
+    def test_item_can_be_put_koriin_and_put_back(self):
+        self.kauppa.aloita_asiointi()
+        self.kauppa.lisaa_koriin(1)
+        self.kauppa.lisaa_koriin(2)
+        self.kauppa.poista_korista(1)
+        self.kauppa.tilimaksu("pekka", "12345")
+
+        self.pankki_mock.tilisiirto.assert_called_with("pekka", 42, "12345", "33333-44455", 3)
+
+   
 
